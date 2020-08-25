@@ -15,6 +15,7 @@ type rootPower struct {
 // PublicBenaloh represents the public key in the Paillier cryptosystem
 type PublicBenaloh struct {
 	y    *big.Int
+	yInv *big.Int
 	n    *big.Int
 	rBig *big.Int
 	r    uint64
@@ -37,6 +38,7 @@ type SecretBenaloh struct {
 func CopyPublicBenaloh(p PublicBenaloh) PublicBenaloh {
 	return PublicBenaloh{
 		y:    copyInt(p.y),
+		yInv: copyInt(p.yInv),
 		n:    copyInt(p.n),
 		rBig: copyInt(p.rBig),
 		r:    p.r,
@@ -97,13 +99,30 @@ func (p PublicBenaloh) Add(a, b *Ciphertext) *Ciphertext {
 	return &Ciphertext{num: bigMod(mulNew(a.num, b.num), p.n)}
 }
 
-// EncryptUint64 encrypt a single uint64 message
+// EncryptUint64 encrypts a single uint64 integer
 // using the formula ((y ** m) * (u ** r)) mod n
 // where u is a chosen randomly
 func (p PublicBenaloh) EncryptUint64(m uint64) *Ciphertext {
-	ym := powMod(p.y, nIntSetUint64(m), p.n)
+	ym := powModUint64(p.y, m, p.n)
 	ur := powModUint64(p.randInt(), p.r, p.n)
 	return &Ciphertext{num: bigMod(mulNew(ym, ur), p.n)}
+}
+
+// EncryptInt encrypts an integer of arbitrary size
+func (p PublicBenaloh) EncryptInt(m *big.Int) *Ciphertext {
+	var ym *big.Int
+	if m.Sign() >= 0 {
+		ym = powMod(p.y, m, p.n)
+	} else {
+		ym = powMod(p.yInv, nInt().Abs(m), p.n)
+	}
+	ur := powModUint64(p.randInt(), p.r, p.n)
+	return &Ciphertext{num: bigMod(mulNew(ym, ur), p.n)}
+}
+
+// EncryptInt64 encrypts a single int64 integer
+func (p PublicBenaloh) EncryptInt64(m int64) *Ciphertext {
+	return p.EncryptInt(nIntSetInt64(m))
 }
 
 // IsZero quickly checks if the plaintext is 0 or not

@@ -5,17 +5,11 @@
 // 1. Addition over plaintext
 // 2. Multiplication of a plaintext by a ciphertext
 //
-// In both of the cryptosystems implemented we have the addition over
+// In both of the cryptosystems implemented, the addition over
 // plaintext is equal to multiplication in the ciphertext.
 //
-// Similarly, the multiplication of a ciphertext to the power of a
-// plaintext is equal to raising the ciphertext to the power of the
-// plaintext
-//
-// For simplicity we consider all plaintextsin multiplication and
-// encryption to be at most uint64 even though it's possible to
-// extend it to signed integers and bigger numbers for Paillier
-// cryptosystem
+// Similarly, the multiplication of a ciphertext with a plaintext
+// is equal to raising the ciphertext to the power of the plaintext
 //
 // The main difference between Paillier and Benaloh cryptosystems
 // is that in the former we can work with operations over big

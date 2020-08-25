@@ -21,6 +21,8 @@ type Ciphertext struct {
 // the following functions
 type PublicKey interface {
 	EncryptUint64(uint64) *Ciphertext
+	EncryptInt64(int64) *Ciphertext
+	EncryptInt(*big.Int) *Ciphertext
 	Add(*Ciphertext, *Ciphertext) *Ciphertext
 	Mul(*Ciphertext, uint64) *Ciphertext
 	Copy() PublicKey
@@ -114,6 +116,9 @@ func GenNewKeysBenaloh(r uint64, security int) (p PublicBenaloh, s SecretBenaloh
 			break
 		}
 	}
+
+	p.yInv = invMod(p.y, p.n)
+
 	sqrtR := uint64(math.Ceil(math.Sqrt(float64(r))))
 	s.sqrtR = sqrtR
 
@@ -159,8 +164,9 @@ func GenNewKeysPaillier(security int) (p PublicPaillier, s SecretPaillier) {
 	p2_1 := subNew(p2, oneInt) // (p2 - 1)
 	s.phi = mulNew(p1_1, p2_1) // (p1 - 1) * (p2 - 1)
 	gcd := nInt().GCD(nil, nil, p1_1, p2_1)
-	s.lambda = divNew(s.phi, gcd)                        // (p1 - 1) * (p2 - 1) / gcd(p1 - 1, p2 - 1)
-	p.g = addNew(p.n, oneInt)                            // n + 1 is a general prefference for g
+	s.lambda = divNew(s.phi, gcd) // (p1 - 1) * (p2 - 1) / gcd(p1 - 1, p2 - 1)
+	p.g = addNew(p.n, oneInt)     // n + 1 is a general prefference for g
+	p.gInv = invMod(p.g, p.n2)
 	s.mu = invMod(p.L(powMod(p.g, s.lambda, p.n2)), s.n) // mu = L(g ** lambda) ** (-1) mod n
 	return
 }

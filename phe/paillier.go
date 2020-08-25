@@ -8,10 +8,11 @@ import (
 
 // PublicPaillier represents the public key in the Paillier cryptosystem
 type PublicPaillier struct {
-	n  *big.Int
-	n2 *big.Int
-	g  *big.Int
-	r  *mRand.Rand
+	n    *big.Int
+	n2   *big.Int
+	g    *big.Int
+	gInv *big.Int
+	r    *mRand.Rand
 }
 
 // SecretPaillier represents the secret key in the Paillier crypstosystem
@@ -26,10 +27,11 @@ type SecretPaillier struct {
 // CopyPublicPaillier to PublicPaillier
 func CopyPublicPaillier(p PublicPaillier) PublicPaillier {
 	return PublicPaillier{
-		n:  copyInt(p.n),
-		n2: copyInt(p.n2),
-		g:  copyInt(p.g),
-		r:  mRand.New(mRand.NewSource(p.r.Int63())),
+		n:    copyInt(p.n),
+		n2:   copyInt(p.n2),
+		g:    copyInt(p.g),
+		gInv: copyInt(p.gInv),
+		r:    mRand.New(mRand.NewSource(p.r.Int63())),
 	}
 }
 
@@ -91,10 +93,28 @@ func (p PublicPaillier) Add(a, b *Ciphertext) *Ciphertext {
 	return &Ciphertext{num: bigMod(mulNew(a.num, b.num), p.n2)}
 }
 
-// EncryptUint64 encrypt a single uint64 message
-// using the formula (g ** msg) * (r ** n) mod (n ** 2)
+// EncryptUint64 encrypt a single uint64 integer
+// using the formula (g ** m) * (r ** n) mod (n ** 2)
 // where r is a chosen randomly
-// TODO add negative numbers
-func (p PublicPaillier) EncryptUint64(msg uint64) *Ciphertext {
-	return &Ciphertext{num: mulNew(powModUint64(p.g, msg, p.n2), powMod(p.randInt(), p.n, p.n2))}
+func (p PublicPaillier) EncryptUint64(m uint64) *Ciphertext {
+	gm := powModUint64(p.g, m, p.n2)
+	rn := powMod(p.randInt(), p.n, p.n2)
+	return &Ciphertext{num: bigMod(mulNew(gm, rn), p.n2)}
+}
+
+// EncryptInt encrypts a single integer of arbitrary size
+func (p PublicPaillier) EncryptInt(m *big.Int) *Ciphertext {
+	var gm *big.Int
+	if m.Sign() >= 0 {
+		gm = powMod(p.g, m, p.n2)
+	} else {
+		gm = powMod(p.gInv, nInt().Abs(m), p.n2)
+	}
+	rn := powMod(p.randInt(), p.n, p.n2)
+	return &Ciphertext{num: bigMod(mulNew(gm, rn), p.n2)}
+}
+
+// EncryptInt64 encrypts a single int64 integer
+func (p PublicPaillier) EncryptInt64(m int64) *Ciphertext {
+	return p.EncryptInt(nIntSetInt64(m))
 }
