@@ -1,4 +1,4 @@
-module cryptosystem
+module github.com/reality95/cryptosystem
 
 go 1.14
 

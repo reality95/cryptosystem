@@ -1,8 +1,8 @@
 package phe
 
 import (
+	pRand "github.com/reality95/cryptosystem/rand"
 	cRand "crypto/rand"
-	pRand "cryptosystem/rand"
 	"math"
 	"math/big"
 	mRand "math/rand"
