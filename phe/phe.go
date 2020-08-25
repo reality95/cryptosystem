@@ -2,7 +2,7 @@ package phe
 
 import (
 	cRand "crypto/rand"
-	pRand "gocrypto/rand"
+	pRand "cryptosystem/rand"
 	mRand "math/rand"
 	"math"
 	"math/big"
