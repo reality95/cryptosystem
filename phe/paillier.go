@@ -2,8 +2,8 @@ package phe
 
 import (
 	cRand "crypto/rand"
-	mRand "math/rand"
 	"math/big"
+	mRand "math/rand"
 )
 
 // PublicPaillier represents the public key in the Paillier cryptosystem
@@ -25,33 +25,33 @@ type SecretPaillier struct {
 
 // CopyPublicPaillier to PublicPaillier
 func CopyPublicPaillier(p PublicPaillier) PublicPaillier {
-    return PublicPaillier {
-        n : copyInt(p.n),
-        n2 : copyInt(p.n2),
-        g : copyInt(p.g),
-        r : mRand.New(mRand.NewSource(p.r.Int63())),
-    }
+	return PublicPaillier{
+		n:  copyInt(p.n),
+		n2: copyInt(p.n2),
+		g:  copyInt(p.g),
+		r:  mRand.New(mRand.NewSource(p.r.Int63())),
+	}
 }
 
 // CopySecretPaillier to SecretPaillier
 func CopySecretPaillier(s SecretPaillier) SecretPaillier {
-    return SecretPaillier {
-        n : copyInt(s.n),
-        n2 : copyInt(s.n2),
-        lambda : copyInt(s.lambda),
-        phi : copyInt(s.phi),
-        mu : copyInt(s.mu),
-    }
+	return SecretPaillier{
+		n:      copyInt(s.n),
+		n2:     copyInt(s.n2),
+		lambda: copyInt(s.lambda),
+		phi:    copyInt(s.phi),
+		mu:     copyInt(s.mu),
+	}
 }
 
 // Copy the public key to an interface
 func (p PublicPaillier) Copy() PublicKey {
-    return CopyPublicPaillier(p)
+	return CopyPublicPaillier(p)
 }
 
 // Copy the secret key to an interface
 func (s SecretPaillier) Copy() SecretKey {
-    return CopySecretPaillier(s)
+	return CopySecretPaillier(s)
 }
 
 // L function takes as argument a ciphertext x and returns (x - 1) / n

@@ -3,9 +3,9 @@ package phe
 import (
 	cRand "crypto/rand"
 	pRand "cryptosystem/rand"
-	mRand "math/rand"
 	"math"
 	"math/big"
+	mRand "math/rand"
 	"sort"
 	"sync"
 	"time"
@@ -23,14 +23,14 @@ type PublicKey interface {
 	EncryptUint64(uint64) *Ciphertext
 	Add(*Ciphertext, *Ciphertext) *Ciphertext
 	Mul(*Ciphertext, uint64) *Ciphertext
-    Copy() PublicKey
+	Copy() PublicKey
 }
 
 // SecretKey for any phe cryptosystem much implement
 // the decryption
 type SecretKey interface {
 	Decrypt(*Ciphertext) *big.Int
-    Copy() SecretKey
+	Copy() SecretKey
 }
 
 func gcd(a, b uint64) uint64 {
@@ -86,7 +86,7 @@ func GenNewKeysBenaloh(r uint64, security int) (p PublicBenaloh, s SecretBenaloh
 	p.rBig = rBig
 	s.rBig = rBig
 	var p1, p2, p1_1, p2_1 *big.Int
-    // Computing prime p1 such that (p1 - 1, r) = 1
+	// Computing prime p1 such that (p1 - 1, r) = 1
 	for {
 		p1, _ = cRand.Prime(p.rn, security)
 		p1_1 = subNew(p1, oneInt)
@@ -94,7 +94,7 @@ func GenNewKeysBenaloh(r uint64, security int) (p PublicBenaloh, s SecretBenaloh
 			break
 		}
 	}
-    // Computing prime p2 such that (p2 - 1, r) = r
+	// Computing prime p2 such that (p2 - 1, r) = r
 	for {
 		p2, _ = pRand.Prime(p.rn, security, r)
 		p2_1 = subNew(p2, oneInt)
@@ -105,9 +105,9 @@ func GenNewKeysBenaloh(r uint64, security int) (p PublicBenaloh, s SecretBenaloh
 	}
 	p.n = mulNew(p1, p2)
 	s.n = p.n
-	s.phi = mulNew(p1_1, p2_1) // phi(n) = (p1 - 1)(p2 - 1)
+	s.phi = mulNew(p1_1, p2_1)       // phi(n) = (p1 - 1)(p2 - 1)
 	s.phiOverR = divNew(s.phi, rBig) // phi(n) / r
-    // Generate y such that y ** (phi(n) / r) != 1 mod n
+	// Generate y such that y ** (phi(n) / r) != 1 mod n
 	for {
 		p.y, _ = cRand.Int(p.rn, p.n)
 		if p.y.Cmp(zeroInt) != 0 && powMod(p.y, s.phiOverR, p.n).Cmp(oneInt) != 0 {
@@ -120,12 +120,12 @@ func GenNewKeysBenaloh(r uint64, security int) (p PublicBenaloh, s SecretBenaloh
 	s.xInvPowers = make([]*big.Int, sqrtR, sqrtR)
 	s.xSqrtPowers = make([]rootPower, sqrtR, sqrtR)
 
-    // x = y ** (phi(n) / r) mod n
-    // x is a root of order r modulo n
+	// x = y ** (phi(n) / r) mod n
+	// x is a root of order r modulo n
 	x := powMod(p.y, s.phiOverR, p.n)
 	// x ** (-1) mod n
-    xInv := invMod(x, p.n)
-    // x ** (sqrtR) mod n
+	xInv := invMod(x, p.n)
+	// x ** (sqrtR) mod n
 	xSqrtPower := powMod(x, nIntSetUint64(sqrtR), p.n)
 
 	s.xInvPowers[0] = nIntSetUint64(1)
@@ -133,8 +133,8 @@ func GenNewKeysBenaloh(r uint64, security int) (p PublicBenaloh, s SecretBenaloh
 
 	for i := uint64(1); i < sqrtR; i++ {
 		// x ** (-i) mod n
-        s.xInvPowers[i] = bigMod(mulNew(xInv, s.xInvPowers[i-1]), s.n)
-        // x ** (i * sqrtR) mod n
+		s.xInvPowers[i] = bigMod(mulNew(xInv, s.xInvPowers[i-1]), s.n)
+		// x ** (i * sqrtR) mod n
 		s.xSqrtPowers[i] = rootPower{power: i * sqrtR, num: bigMod(mulNew(xSqrtPower, s.xSqrtPowers[i-1].num), s.n)}
 	}
 

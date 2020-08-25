@@ -13,24 +13,24 @@
 // plaintext
 //
 // For simplicity we consider all plaintextsin multiplication and
-// encryption to be at most uint64 even though it's possible to 
-// extend it to signed integers and bigger numbers for Paillier 
+// encryption to be at most uint64 even though it's possible to
+// extend it to signed integers and bigger numbers for Paillier
 // cryptosystem
 //
 // The main difference between Paillier and Benaloh cryptosystems
-// is that in the former we can work with operations over big 
-// integers while with the latter we trade the max size of plaintext 
+// is that in the former we can work with operations over big
+// integers while with the latter we trade the max size of plaintext
 // and a bit of key generation and decryption for speed of encryption
 //
 // Assuming that the multiplication time of two N bit sized numbers
-// is equal to T(N). 
+// is equal to T(N).
 //
-// Paillier takes O(Security * T(Security)) per encryption and 
-// decryption. We can do operations with plaintext modulo bits 
+// Paillier takes O(Security * T(Security)) per encryption and
+// decryption. We can do operations with plaintext modulo bits
 // magnitude O(Security ** 2)
 //
 // For Benaloh cryptosystem an extra parameter r should be specified
-// which will signify the plaintext modulo. To make the implementation 
+// which will signify the plaintext modulo. To make the implementation
 // easier, r was set to be a prime. If the method is called with a
 // nonprime r then it will be increased until it reaches a prime.
 //
@@ -39,11 +39,11 @@
 // so a new function was implemented in PSI/rand to find the prime p quicker
 //
 // The encryption in Benaloh cryptosystem takes O(T(Security) * log r)
-// and the decryption takes 
+// and the decryption takes
 // O(Security * T(Security) + (Security * log(r) + T(Security)) * r ** 0.5)
 // using the meet-in-the-middle approach to finding the discrete logarithm.
 // This makes the decryption time a bottleneck in the overall time. In cases
-// when we need to decrypt a few ciphertexts such as PSI Cardinal, it is 
+// when we need to decrypt a few ciphertexts such as PSI Cardinal, it is
 // more desirable than Paillier
 //
 // A significant disadvantage is that we need to store O(Security * r ** 0.5)
@@ -53,8 +53,8 @@
 //
 // For Vector encryption EncryptVectorUint64 and EncryptVectorUint64Parallel
 // should be used.
-// 
-// For Vector decryption DecryptVector and DecryptVectorParallel should be 
+//
+// For Vector decryption DecryptVector and DecryptVectorParallel should be
 // used
 //
 // Note that the functions above work for any struct that implements PublicKey

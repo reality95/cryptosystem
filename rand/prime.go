@@ -10,9 +10,9 @@
 package rand
 
 import (
-        "errors"
-        "io"
-        "math/big"
+	"errors"
+	"io"
+	"math/big"
 )
 
 const uint64Max = (1 << 64) - 1
@@ -25,8 +25,10 @@ var smallPrimesProduct = new(big.Int).SetUint64(16294579238595022365)
 
 var oneInt = new(big.Int).SetUint64(1)
 
+// Prime generates a random prime p with `bits` being the maximum number of
+// bits such that r | p - 1
 func Prime(rand io.Reader, bits int, r uint64) (p *big.Int, err error) {
-    if bits < 2 {
+	if bits < 2 {
 		err = errors.New("crypto/rand: prime size must be at least 2-bit")
 		return
 	}
@@ -41,7 +43,7 @@ func Prime(rand io.Reader, bits int, r uint64) (p *big.Int, err error) {
 
 	bigMod := new(big.Int)
 
-    rBig := new(big.Int).SetUint64(r)
+	rBig := new(big.Int).SetUint64(r)
 
 	for {
 		_, err = io.ReadFull(rand, bytes)
@@ -69,18 +71,18 @@ func Prime(rand io.Reader, bits int, r uint64) (p *big.Int, err error) {
 
 		p.SetBytes(bytes)
 
-        // If p > r then make p be equivalent to 1 mod r
-        // By taking p = p - ((p - 1) mod r)
-        if p.Cmp(rBig) > 0 {
-            // p - 1
-            bigMod.Sub(p, oneInt)
-            // (p - 1) mod r
-            bigMod.Mod(bigMod, rBig)
-            // p - ((p - 1) mod r)
-            p.Sub(p, bigMod)
-        } else {
-            continue
-        }
+		// If p > r then make p be equivalent to 1 mod r
+		// By taking p = p - ((p - 1) mod r)
+		if p.Cmp(rBig) > 0 {
+			// p - 1
+			bigMod.Sub(p, oneInt)
+			// (p - 1) mod r
+			bigMod.Mod(bigMod, rBig)
+			// p - ((p - 1) mod r)
+			p.Sub(p, bigMod)
+		} else {
+			continue
+		}
 
 		// Calculate the value mod the product of smallPrimes. If it's
 		// a multiple of any of these primes we add two until it isn't.
@@ -90,8 +92,8 @@ func Prime(rand io.Reader, bits int, r uint64) (p *big.Int, err error) {
 		mod := bigMod.Uint64()
 
 	NextDelta:
-		for delta, deltaMax := uint64(0), (uint64Max - mod) / r; delta < 1<<20 && delta <= deltaMax; delta += 2 {
-			m := mod + delta * r
+		for delta, deltaMax := uint64(0), (uint64Max-mod)/r; delta < 1<<20 && delta <= deltaMax; delta += 2 {
+			m := mod + delta*r
 			for _, prime := range smallPrimes {
 				if m%uint64(prime) == 0 && (bits > 6 || m != uint64(prime)) {
 					continue NextDelta

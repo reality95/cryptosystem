@@ -12,28 +12,28 @@ func bigMod(a, mod *big.Int) *big.Int {
 }
 
 func copyInt(x *big.Int) *big.Int {
-    return nInt().Set(x)
+	return nInt().Set(x)
 }
 
 func copyIntSlice(s []*big.Int) (ans []*big.Int) {
-    N := len(s)
-    ans = make([]*big.Int, N, N)
-    for idx, num := range s {
-        ans[idx] = copyInt(num)
-    }
-    return
+	N := len(s)
+	ans = make([]*big.Int, N, N)
+	for idx, num := range s {
+		ans[idx] = copyInt(num)
+	}
+	return
 }
 
 func copyRootPowerSlice(s []rootPower) (ans []rootPower) {
-    N := len(s)
-    ans = make([]rootPower, N, N)
-    for idx, rPow := range s {
-        ans[idx] = rootPower {
-            power : rPow.power,
-            num : copyInt(rPow.num),
-        }
-    }
-    return
+	N := len(s)
+	ans = make([]rootPower, N, N)
+	for idx, rPow := range s {
+		ans[idx] = rootPower{
+			power: rPow.power,
+			num:   copyInt(rPow.num),
+		}
+	}
+	return
 }
 
 func nInt() *big.Int {
