@@ -1,4 +1,4 @@
-module gocrypto
+module cryptosystem
 
 go 1.14
 
