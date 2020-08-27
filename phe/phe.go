@@ -1,8 +1,8 @@
 package phe
 
 import (
-	pRand "github.com/reality95/cryptosystem/rand"
 	cRand "crypto/rand"
+	pRand "github.com/reality95/cryptosystem/rand"
 	"math"
 	"math/big"
 	mRand "math/rand"
@@ -24,7 +24,9 @@ type PublicKey interface {
 	EncryptInt64(int64) *Ciphertext
 	EncryptInt(*big.Int) *Ciphertext
 	Add(*Ciphertext, *Ciphertext) *Ciphertext
-	Mul(*Ciphertext, uint64) *Ciphertext
+	MulUint64(*Ciphertext, uint64) *Ciphertext
+	MulInt64(*Ciphertext, int64) *Ciphertext
+	MulInt(*Ciphertext, *big.Int) *Ciphertext
 	Copy() PublicKey
 }
 

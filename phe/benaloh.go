@@ -70,12 +70,22 @@ func (s SecretBenaloh) Copy() SecretKey {
 	return CopySecretBenaloh(s)
 }
 
-// Mul multiplies one ciphertext with a plaintext
-//
-// In Benaloh cryptosystem multiplication of a ciphertext `a`
-// with a plaintext `b` is the same as take `a` to the power of `b`
-func (p PublicBenaloh) Mul(a *Ciphertext, b uint64) *Ciphertext {
+// MulUint64 multiplies one ciphertext with a uint64 plaintext
+func (p PublicBenaloh) MulUint64(a *Ciphertext, b uint64) *Ciphertext {
 	return &Ciphertext{num: powModUint64(a.num, b, p.n)}
+}
+
+// MulInt multiplies one ciphertext with a plaintext of arbitrary size
+func (p PublicBenaloh) MulInt(a *Ciphertext, b *big.Int) *Ciphertext {
+	if a.num.Sign() < 0 {
+		return &Ciphertext{num: powMod(invMod(a.num, p.n), nInt().Abs(b), p.n)}
+	}
+	return &Ciphertext{num: powMod(a.num, b, p.n)}
+}
+
+// MulInt64 multiplies one ciphertext with a int64 plaintext
+func (p PublicBenaloh) MulInt64(a *Ciphertext, b int64) *Ciphertext {
+	return p.MulInt(a, nIntSetInt64(b))
 }
 
 // GetPlaintextMod returns the mod over which all

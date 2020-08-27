@@ -77,12 +77,22 @@ func (s SecretPaillier) Decrypt(c *Ciphertext) *big.Int {
 	return bigMod(mulNew(s.L(powMod(c.num, s.lambda, s.n2)), s.mu), s.n)
 }
 
-// Mul multiplies one ciphertext with a plaintext
-//
-// In Paillier cryptosystem multiplication of a ciphertext `a`
-// with a plaintext `b` is the same as take `a` to the power of `b`
-func (p PublicPaillier) Mul(a *Ciphertext, b uint64) *Ciphertext {
+// MulUint64 multiplies one ciphertext with a uint64 plaintext
+func (p PublicPaillier) MulUint64(a *Ciphertext, b uint64) *Ciphertext {
 	return &Ciphertext{num: powModUint64(a.num, b, p.n2)}
+}
+
+// MulInt64 multiplies one ciphertext with a int64 plaintext
+func (p PublicPaillier) MulInt64(a *Ciphertext, b int64) *Ciphertext {
+	return p.MulInt(a, nIntSetInt64(b))
+}
+
+// MulInt multiplies one ciphertext with a plaintext of arbitrary size
+func (p PublicPaillier) MulInt(a *Ciphertext, b *big.Int) *Ciphertext {
+	if a.num.Sign() < 0 {
+		return &Ciphertext{num: powMod(invMod(a.num, p.n2), nInt().Abs(b), p.n2)}
+	}
+	return &Ciphertext{num: powMod(a.num, b, p.n2)}
 }
 
 // Add adds two ciphertexts
